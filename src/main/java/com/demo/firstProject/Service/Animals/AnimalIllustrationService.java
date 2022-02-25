@@ -1,5 +1,6 @@
 package com.demo.firstProject.Service.Animals;
 
+import com.demo.firstProject.Config.Domain;
 import com.demo.firstProject.Controller.Image.SetName;
 import com.demo.firstProject.DTO.Animals.AnimalIllustrationDTO;
 import com.demo.firstProject.Exception.BaseException;
@@ -21,9 +22,6 @@ public class AnimalIllustrationService {
 
     private final AnimalRepository animalRepository;
     private final AnimalIllustrationRepositoty animalIllustrationRepositoty;
-
-    @Value("${dir_name.illustration}")
-    private String rootIllustration;
 
     public AnimalIllustrationService(AnimalRepository animalRepository, AnimalIllustrationRepositoty animalIllustrationRepositoty) {
         this.animalRepository = animalRepository;
@@ -53,7 +51,7 @@ public class AnimalIllustrationService {
             for (MultipartFile MultipartFileObj : illustrationFiles) {
                 // create name and path of illustration
                 String animalIllustrationName = SetName.getImageName(MultipartFileObj.getOriginalFilename());
-                Path animalIllustrationPath = Path.of(rootIllustration + "/" + animalIllustrationName);
+                Path animalIllustrationPath = Path.of(Domain.dir_name_animal_illustrations + "/" + animalIllustrationName);
                 // create object for save
                 AnimalIllustrationEntity animalIllustrationEntityObj = new AnimalIllustrationEntity();
                 animalIllustrationEntityObj.setName(animalIllustrationName);
@@ -105,12 +103,12 @@ public class AnimalIllustrationService {
         String illustrationName = SetName.getImageName(illustrationFile.getOriginalFilename());
 
         // create path of illustration for upload
-        Path animalIllustrationPath = Path.of(rootIllustration + "/" + illustrationName);
+        Path animalIllustrationPath = Path.of(Domain.dir_name_animal_illustrations + "/" + illustrationName);
 
         try {
             Files.copy(illustrationFile.getInputStream(), animalIllustrationPath, StandardCopyOption.REPLACE_EXISTING);
             // create path of illustration for delete
-            Path oldPath = Path.of(rootIllustration + "/" + animalIllustrationResult.getName());
+            Path oldPath = Path.of(Domain.dir_name_animal_illustrations + "/" + animalIllustrationResult.getName());
             Files.delete(oldPath);
         } catch (Exception e) {
             throw new BaseException("server.error.with->" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -148,7 +146,7 @@ public class AnimalIllustrationService {
         // get entity of illustration
         AnimalIllustrationEntity animalIllustrationResult = animalIllustrationRepositoty.getById(illustrationId);
         // create path of illustration
-        Path illustrationPath = Path.of(rootIllustration + "/" + animalIllustrationResult.getName());
+        Path illustrationPath = Path.of(Domain.dir_name_animal_illustrations + "/" + animalIllustrationResult.getName());
         try {
             Files.delete(illustrationPath);
         } catch (Exception e) {

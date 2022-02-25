@@ -1,5 +1,6 @@
 package com.demo.firstProject.Service.Animals;
 
+import com.demo.firstProject.Config.Domain;
 import com.demo.firstProject.Controller.Image.SetName;
 import com.demo.firstProject.Exception.BaseException;
 import com.demo.firstProject.DTO.Animals.AnimalDTO;
@@ -26,9 +27,6 @@ public class AnimalsService {
     private final AnimalRepository animalRepository;
     private final AnimalCategoryRepository animalCategoryRepository;
 
-    @Value("${dir_name.animal}")
-    private String rootDirImage;
-
     public AnimalsService(AnimalRepository animalRepository, AnimalCategoryRepository animalCategoryRepository) {
         this.animalRepository = animalRepository;
         this.animalCategoryRepository = animalCategoryRepository;
@@ -37,7 +35,8 @@ public class AnimalsService {
 
     // TODO:: Get List Animal
     public List<AnimalDTO> AnimalService_GetList() {
-        return animalRepository.findAll().stream().map(AnimalEntity::SetAnimal_dto).collect(Collectors.toList());
+        List<AnimalDTO> animalDTO = animalRepository.findAll().stream().map(AnimalEntity::SetAnimal_dto).collect(Collectors.toList());
+        return animalDTO;
     }
 
 
@@ -74,7 +73,7 @@ public class AnimalsService {
         // create name image
         String imageProfileName = SetName.getImageName(imageProfile.getOriginalFilename());
         // create path image
-        Path newPath = Path.of(rootDirImage + imageProfileName);
+        Path newPath = Path.of(Domain.dir_name_animal + imageProfileName);
         // upload image
         try{
             Files.copy(imageProfile.getInputStream(), newPath, StandardCopyOption.REPLACE_EXISTING);
@@ -147,10 +146,10 @@ public class AnimalsService {
         // set for image
         if (imageProfile != null) {
             String imageProfileName = SetName.getImageName(imageProfile.getOriginalFilename());
-            Path imageProfilePath = Path.of(rootDirImage + "/" + imageProfileName);
+            Path imageProfilePath = Path.of(Domain.dir_name_animal + "/" + imageProfileName);
             try {
                 Files.copy(imageProfile.getInputStream(), imageProfilePath, StandardCopyOption.REPLACE_EXISTING);
-                Files.delete(Path.of(rootDirImage + "/" + animalEntity.getImageProfile()));
+                Files.delete(Path.of(Domain.dir_name_animal + "/" + animalEntity.getImageProfile()));
             } catch (Exception e) {
                 throw new BaseException("can't upload image. System:" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -165,7 +164,7 @@ public class AnimalsService {
         if (animalEntityResult.getName() == null) {
             try {
                 String imageProfileName = SetName.getImageName(imageProfile.getOriginalFilename());
-                Path imageProfilePath = Path.of(rootDirImage + "/" + imageProfileName);
+                Path imageProfilePath = Path.of(Domain.dir_name_animal + "/" + imageProfileName);
                 Files.delete(imageProfilePath);
             } catch (Exception e) {
                 throw new BaseException("Serve.File.error" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -188,7 +187,7 @@ public class AnimalsService {
         try {
             AnimalEntity animalEntityReslt = animalRepository.getById(id);
             animalRepository.deleteById(id);
-            Files.delete(Path.of(rootDirImage + "/" + animalEntityReslt.getImageProfile()));
+            Files.delete(Path.of(Domain.dir_name_animal + "/" + animalEntityReslt.getImageProfile()));
         } catch (Exception e) {
             throw new BaseException("server can't delete data.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
