@@ -1,13 +1,13 @@
 package com.demo.firstProject.JPA.Entity;
 
-import com.demo.firstProject.Config.Domain;
+import com.demo.firstProject.Configuration.Domain;
 import com.demo.firstProject.DTO.Animals.AnimalIllustrationDTO;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Data
-@Entity(name = "Animals_Illustration_TB")
+@Entity(name = "animals_illustration_tb")
 public class AnimalIllustrationEntity {
 
     @Id

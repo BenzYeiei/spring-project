@@ -1,11 +1,11 @@
 package com.demo.firstProject.Controller.Animals;
 
-import com.demo.firstProject.Config.Domain;
+import com.demo.firstProject.Configuration.Domain;
 import com.demo.firstProject.DTO.Animals.AnimalDTO;
 import com.demo.firstProject.DTO.Request.AnimalRequest;
 import com.demo.firstProject.Exception.BaseException;
-import com.demo.firstProject.Service.Animals.AnimalIllustrationService;
-import com.demo.firstProject.Service.Animals.AnimalsService;
+import com.demo.firstProject.Service.Resource.Animals.AnimalIllustrationService;
+import com.demo.firstProject.Service.Resource.Animals.AnimalsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/animals")
@@ -54,7 +53,8 @@ public class AnimalApi {
     @PostMapping("")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    public String AnimalCrate(
+//    public String AnimalCrate(
+    public ResponseEntity AnimalCrate(
             AnimalRequest request,
             @RequestParam(name = "imageProfile", required = false) MultipartFile imageProfile,
             @RequestParam(name = "illustration", required = false) MultipartFile[] illustrationFiles
@@ -63,7 +63,9 @@ public class AnimalApi {
 
         animalIllustrationService.AnimalIllustrationService_Create(animalId, illustrationFiles);
 
-        return Domain.domainUrl + "/api/animals/" + animalId;
+        AnimalDTO animalDTO = animalsService.AnimalService_GetOneById(animalId);
+//        return Domain.domainUrl + "/api/animals/" + animalId;-
+        return ResponseEntity.status(HttpStatus.OK).body(animalDTO);
     }
 
 

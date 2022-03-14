@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-@Entity(name = "AnimalCategory_TB")
+@Entity(name = "animal_category_tb")
 public class AnimalCategoryEntity {
 
     @Id

@@ -1,6 +1,6 @@
 package com.demo.firstProject.Controller.Animals;
 
-import com.demo.firstProject.Service.Animals.AnimalIllustrationService;
+import com.demo.firstProject.Service.Resource.Animals.AnimalIllustrationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

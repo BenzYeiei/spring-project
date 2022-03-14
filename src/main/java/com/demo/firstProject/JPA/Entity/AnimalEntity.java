@@ -1,6 +1,6 @@
 package com.demo.firstProject.JPA.Entity;
 
-import com.demo.firstProject.Config.Domain;
+import com.demo.firstProject.Configuration.Domain;
 import com.demo.firstProject.DTO.Animals.AnimalDTO;
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Data
 //@JsonInclude(JsonInclude.Include.NON_NULL)
-@Entity(name = "Animals_TB")
+@Entity(name = "animals_tb")
 public class AnimalEntity {
 
     @Id

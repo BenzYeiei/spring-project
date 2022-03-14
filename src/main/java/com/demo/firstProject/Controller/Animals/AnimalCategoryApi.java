@@ -1,7 +1,7 @@
 package com.demo.firstProject.Controller.Animals;
 
 import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
-import com.demo.firstProject.Service.Animals.AnimalCategoryService;
+import com.demo.firstProject.Service.Resource.Animals.AnimalCategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
