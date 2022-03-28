@@ -24,4 +24,6 @@ public class AnimalDTO {
 
     private List<AnimalIllustrationDTO> animalIllustration;
 
+    private String CreatedByUser;
+
 }

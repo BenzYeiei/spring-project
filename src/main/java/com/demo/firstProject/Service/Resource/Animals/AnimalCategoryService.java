@@ -4,122 +4,159 @@ import com.demo.firstProject.Exception.BaseException;
 import com.demo.firstProject.DTO.Animals.AnimalCategoryDTO;
 import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
 import com.demo.firstProject.JPA.Repository.AnimalCategoryRepository;
+import com.demo.firstProject.Service.Resource.Image.ImageService;
+import com.demo.firstProject.Service.ServiceModel.AnimalService.AnimalCategoryModel_CRUD;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
-public class AnimalCategoryService {
+public class AnimalCategoryService implements AnimalCategoryModel_CRUD {
 
-    private final AnimalCategoryRepository animalCategoryRepository;
+    @Autowired
+    private AnimalCategoryRepository animalCategoryRepository;
 
-    public AnimalCategoryService(AnimalCategoryRepository animalCategoryRepository) {
-        this.animalCategoryRepository = animalCategoryRepository;
-    }
+    @Autowired
+    private ImageService imageService;
 
 
     // TODO:: Get List
-    public ResponseEntity AnimalCategoryService_GetList() {
+    @Override
+    public List<AnimalCategoryEntity> AnimalCategoryService_GetList() {
         List<AnimalCategoryEntity> animalCategoryResult = animalCategoryRepository.findAll();
-
-        List<AnimalCategoryDTO> animalCategoryDTO = animalCategoryResult.stream().map(AnimalCategoryEntity::SetAnimalCategoryDTO).collect(Collectors.toList());
-
-        return ResponseEntity.status(HttpStatus.OK).body(animalCategoryDTO);
+        return animalCategoryResult;
     }
 
 
     // TODO:: Get One By Id
-    public ResponseEntity AnimalCategoryService_GetOne(int id) {
-        // TODO: Check exists by id
-        boolean isAnimalCategory = animalCategoryRepository.existsById(id);
-        if (!isAnimalCategory) {
-            throw new BaseException("api.animals.category.get.field.id.not-found", HttpStatus.NOT_FOUND);
+    @Override
+    public AnimalCategoryEntity AnimalCategoryService_GetOne(int id, String path) {
+
+        // get data
+        Optional<AnimalCategoryEntity> op_AnimalCategory = animalCategoryRepository.findById(id);
+
+        // Check exists id
+        if (op_AnimalCategory.isEmpty()) {
+            throw new BaseException("category not found.", HttpStatus.NOT_FOUND, path);
         }
 
-        AnimalCategoryEntity animalCategoryResult = animalCategoryRepository.getById(id);
+        // convert Optional to AnimalCategoryEntity
+        AnimalCategoryEntity animalCategoryResult = op_AnimalCategory.get();
 
-        return ResponseEntity.status(HttpStatus.OK).body(animalCategoryResult.SetAnimalCategoryDTO());
+        return animalCategoryResult;
     }
 
 
     // TODO:: Create Animal Category
-    public ResponseEntity AnimalCategoryService_Create(AnimalCategoryEntity requestBody) throws BaseException {
-        // TODO: validate
-        if (requestBody.getCategoryName() == null) {
-            throw new BaseException("api.animals.categories.post.field.categoryName.null", HttpStatus.BAD_REQUEST);
+    @Override
+    public AnimalCategoryEntity AnimalCategoryService_Create(String name, String path) throws BaseException {
+        // check field categoryName
+        if (name == null) {
+            throw new BaseException("field categoryName is null.", HttpStatus.BAD_REQUEST, path);
         }
 
-        // TODO: verify
-        // TODO: LowerCase String for Save
-        requestBody.setCategoryName(requestBody.getCategoryName().toLowerCase());
+        // check length of name
+        if (name.length() > 15) {
+            throw new BaseException("field categoryName length size 15.", HttpStatus.BAD_REQUEST, path);
+        }
 
-        // TODO: Check categoryName duplicate
-        boolean isExistsName = animalCategoryRepository.existsByCategoryName(requestBody.getCategoryName());
+        // LowerCase String for Save
+        String lowerCaseName = name.toLowerCase();
+
+        // Check categoryName duplicate
+        boolean isExistsName = animalCategoryRepository.existsByCategoryName(lowerCaseName);
         if (isExistsName) {
-            throw new BaseException("api.animals.categories.post.field.categoryName.exists", HttpStatus.BAD_REQUEST);
+            throw new BaseException("field categoryName is exists", HttpStatus.BAD_REQUEST, path);
         }
 
-        // TODO: create Object
+        // create Object
         AnimalCategoryEntity animalCategoryEntity = new AnimalCategoryEntity();
-        animalCategoryEntity.setCategoryName(requestBody.getCategoryName());
 
-        // TODO: Save()
-        AnimalCategoryEntity animalCategoryResultBySave = animalCategoryRepository.save(animalCategoryEntity);
-        AnimalCategoryEntity animalCategoryResult = animalCategoryRepository.getById(animalCategoryResultBySave.getId());
+        // set data
+        animalCategoryEntity.setCategoryName(lowerCaseName);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(animalCategoryResult.SetAnimalCategoryDTO());
+        // create variable for get result data
+        AnimalCategoryEntity getData;
+
+        // Save()
+        try {
+            getData = animalCategoryRepository.save(animalCategoryEntity);
+        } catch (RuntimeException e) {
+            throw new BaseException("Server message -> " + e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR, path);
+        }
+
+        // map animalCategory to dto
+//        AnimalCategoryDTO animalCategoryResult = getData.setAnimalCategoryDTO(imageService.getDomainUrl());
+
+        return getData;
     }
 
 
     // TODO:: Update Animal Category
-    public ResponseEntity AnimalCategoryService_Update(int id, AnimalCategoryEntity requestBody) {
-        // TODO: Check exists by id
+    @Override
+    public AnimalCategoryEntity AnimalCategoryService_Update(int id, String categoryName, String path) {
+        // Check exists by id
         boolean isAnimalCategory = animalCategoryRepository.existsById(id);
         if (!isAnimalCategory) {
-            throw new BaseException("api.animals.categories.put.field.id.not-found", HttpStatus.NOT_FOUND);
+            throw new BaseException("parameter id not found.", HttpStatus.NOT_FOUND, path);
         }
 
-        // TODO: Check animal category name
-        if (requestBody.getCategoryName() == null) {
-            throw new BaseException("api.animals.categories.put.field.categoryName.null", HttpStatus.BAD_REQUEST);
+        // Check animal category name
+        if (categoryName == null) {
+            throw new BaseException("field categoryName is null.", HttpStatus.BAD_REQUEST, path);
         }
 
-        // TODO: LowerCase String for update
-        requestBody.setCategoryName(requestBody.getCategoryName().toLowerCase());
+        // LowerCase String for update
+        String lowerCaseName = categoryName.toLowerCase();
 
-        // TODO: Check categoryName duplicate
-        boolean isExistsName = animalCategoryRepository.existsByCategoryName(requestBody.getCategoryName());
+        // Check categoryName duplicate
+        boolean isExistsName = animalCategoryRepository.existsByCategoryName(lowerCaseName);
         if (isExistsName) {
-            throw new BaseException("api.animals.categories.post.field.categoryName.exists", HttpStatus.BAD_REQUEST);
+            throw new BaseException("field categoryName is exists.", HttpStatus.BAD_REQUEST, path);
         }
 
-        // TODO: Create object
+        // Create object
         AnimalCategoryEntity animalCategoryObject = animalCategoryRepository.getById(id);
-        animalCategoryObject.setCategoryName(requestBody.getCategoryName());
 
-        // TODO: Update
-        AnimalCategoryEntity animalCategoryResult = animalCategoryRepository.save(animalCategoryObject);
+        // set data
+        animalCategoryObject.setCategoryName(lowerCaseName);
 
-        return ResponseEntity.status(HttpStatus.OK).body(animalCategoryResult.SetAnimalCategoryDTO());
+        // create variable for get result data
+        AnimalCategoryEntity getResult;
+
+        // Update
+        try {
+            getResult = animalCategoryRepository.save(animalCategoryObject);
+        } catch (Exception e) {
+            throw new BaseException("Server message ->" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, path);
+        }
+
+        return getResult;
     }
 
 
     // TODO:: Delete Animal Category
-    public ResponseEntity AnimalCategoryService_Delete(int id) {
-        // TODO: Check exists by id
+    @Override
+    public void AnimalCategoryService_Delete(int id, String path) {
+        // Check exists by id
         boolean isAnimalCategory = animalCategoryRepository.existsById(id);
         if (!isAnimalCategory) {
-            throw new BaseException("api.animals.categories.delete.field.not-found", HttpStatus.NOT_FOUND);
+            throw new BaseException("parameter not found.", HttpStatus.NOT_FOUND, path);
         }
 
-        // TODO: Delete
-        animalCategoryRepository.deleteById(id);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<AnimalCategoryEntity>());
+        // Delete
+        try {
+            animalCategoryRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new BaseException("Server message -> " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, path);
+        }
     }
 
 }

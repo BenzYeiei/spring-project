@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 public class BaseException extends RuntimeException {
     private HttpStatus Code;
 
-    private Object payload = null;
+    private String path = null;
 
 
     public BaseException(String message, HttpStatus code) {
@@ -16,9 +16,9 @@ public class BaseException extends RuntimeException {
         Code = code;
     }
 
-    public BaseException(String message, HttpStatus code, Object payload) {
+    public BaseException(String message, HttpStatus code, String path) {
         super(message);
         this.Code = code;
-        this.payload = payload;
+        this.path = path;
     }
 }

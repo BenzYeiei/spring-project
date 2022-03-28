@@ -17,18 +17,20 @@ public class AnimalCategoryEntity {
     @Column(name = "animal_category_id")
     private int id;
 
-    @Column(name = "animal_category_name", nullable = false, unique = true, length = 25)
+    @Column(name = "animal_category_name", nullable = false, unique = true, length = 15)
     private String categoryName;
 
     @OneToMany(mappedBy = "animalCategoryFK", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AnimalEntity> animalListByCategory = new ArrayList<>();
 
 
-    public AnimalCategoryDTO SetAnimalCategoryDTO() {
+    public AnimalCategoryDTO setAnimalCategoryDTO(String domain) {
         AnimalCategoryDTO animalCategoryDTO = new AnimalCategoryDTO();
         animalCategoryDTO.setId(this.id);
         animalCategoryDTO.setCategoryName(this.getCategoryName());
-        animalCategoryDTO.setAnimalListByCategory(this.getAnimalListByCategory().stream().map(AnimalEntity::SetAnimal_dto).collect(Collectors.toList()));
+        animalCategoryDTO.setAnimalListByCategory(this.getAnimalListByCategory().stream().map(
+                object -> object.setAnimal_dto(domain)
+        ).collect(Collectors.toList()));
         return animalCategoryDTO;
     }
 

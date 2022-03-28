@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 @Data
 public class AnimalRequest {
-    private long id;
 
     private String name;
 
@@ -14,7 +13,5 @@ public class AnimalRequest {
 
     private boolean statusState = false;
 
-    private LocalDateTime createTime;
-
-    private String animalCategoryFK;
+    private String animalCategory;
 }

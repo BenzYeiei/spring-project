@@ -14,7 +14,7 @@ public class HandleException {
         ObjectException responseException = new ObjectException(
                 e.getMessage(),
                 e.getCode().value(),
-                e.getPayload(),
+                e.getPath(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(responseException, e.getCode());

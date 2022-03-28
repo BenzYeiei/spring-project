@@ -11,15 +11,15 @@ public class ObjectException {
 
     private final int httpStatusCode;
 
-    private final Object payload;
+    private final String path;
 
     private final LocalDateTime timestamp;
 
 
-    public ObjectException(String message, int httpStatusCode, Object payload, LocalDateTime timestamp) {
+    public ObjectException(String message, int httpStatusCode, String path, LocalDateTime timestamp) {
         this.message = message;
         this.httpStatusCode = httpStatusCode;
-        this.payload = payload;
+        this.path = path;
         this.timestamp = timestamp;
     }
 }

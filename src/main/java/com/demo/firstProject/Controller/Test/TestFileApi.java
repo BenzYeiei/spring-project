@@ -18,7 +18,7 @@ public class TestFileApi {
 
     private final TestFileService testFileService;
 
-    @Value("${dir_name.root}")
+    @Value("${image.dir_name.root}")
     String abc;
 
     public TestFileApi(TestFileService testFileService) {

@@ -1,4 +1,4 @@
-package com.demo.firstProject.Service;
+package com.demo.firstProject.Service.Resource.Image;
 
 import com.demo.firstProject.Exception.BaseException;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 import java.nio.file.Path;
 
 @Service
-public class ImageService {
+public class ImageFetch_Service {
 
-    @Value("${dir_name.base}")
+    @Value("${image.dir_name.base}")
     private String rootDirBase;
 
-    @Value("${dir_name.animal}")
+    @Value("${image.dir_name.animal}")
     private String rootDirAnimalProfile;
 
-    @Value("${dir_name.illustration}")
+    @Value("${image.dir_name.illustration}")
     private String rootDirAnimalIllustration;
 
 

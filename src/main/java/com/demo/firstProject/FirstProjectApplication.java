@@ -7,6 +7,9 @@ import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
 import com.demo.firstProject.JPA.Entity.Account.PrivilegeEntity;
 import com.demo.firstProject.JPA.Entity.Account.RoleEntity;
 import com.demo.firstProject.Service.Resource.Account.InitRegisterService;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.StorageOptions;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,9 +18,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 @SpringBootApplication
 public class FirstProjectApplication {
@@ -25,6 +35,69 @@ public class FirstProjectApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FirstProjectApplication.class, args);
 	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/api/tests/media-type/videos").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/api/tests/media-type/images").allowedOrigins("http://localhost:3000");
+			}
+		};
+	}
+
+	@Bean
+	public String getBucketName_FireBase() {
+
+		try {
+			String bucketName = null;
+
+			File getFile = new File(System.getProperty("user.dir") + "\\secret\\bucket.txt");
+
+			Scanner myReader = new Scanner(getFile);
+			while (myReader.hasNextLine()) {
+				bucketName = myReader.nextLine();
+			}
+			myReader.close();
+			return bucketName;
+		} catch (FileNotFoundException e) {
+			System.out.println("An error occurred.");
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Bean
+	public StorageOptions cloud_FireStorage() {
+
+		StorageOptions storageOptions = null;
+
+		try {
+			// get admin-sdk
+			FileInputStream serviceAccount = serviceAccount = new FileInputStream(
+					System.getProperty("user.dir") + "\\secret\\firebase-adminsdk.json"
+			);
+
+			Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(
+					System.getProperty("user.dir") + "\\secret\\firebase-adminsdk.json"
+			));
+
+			return StorageOptions.newBuilder()
+					.setProjectId(getBucketName_FireBase().replace(".appspot.com", ""))
+//					.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+					.setCredentials(credentials)
+					.build();
+		} catch (FileNotFoundException e) {
+			System.out.println(e.getMessage());
+			return null;
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+
+
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {

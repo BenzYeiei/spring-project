@@ -1,6 +1,7 @@
 package com.demo.firstProject.Controller.Image;
 
-import com.demo.firstProject.Service.ImageService;
+import com.demo.firstProject.Service.Resource.Image.ImageFetch_Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,15 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ImageController {
 
-    private final ImageService imageService;
-
-    public ImageController(ImageService imageService) {
-        this.imageService = imageService;
-    }
+    @Autowired
+    private ImageFetch_Service imageFetchService;
 
     @GetMapping("/images/{name}")
     public ResponseEntity<Resource> Api_Image(@PathVariable String name) {
-        return imageService.ImageService_ResponseAllImage(name);
+        return imageFetchService.ImageService_ResponseAllImage(name);
     }
 
 }
