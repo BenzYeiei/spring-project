@@ -3,14 +3,18 @@ package com.demo.firstProject.Service.Resource.Animals;
 import com.demo.firstProject.DTO.Animals.AnimalDTO;
 import com.demo.firstProject.Exception.BaseException;
 import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
-import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
-import com.demo.firstProject.JPA.Entity.AnimalEntity;
-import com.demo.firstProject.JPA.Entity.AnimalIllustrationEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalCategoryEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalIllustrationEntity;
 import com.demo.firstProject.JPA.Repository.Account.AccountRepository;
 import com.demo.firstProject.JPA.Repository.AnimalCategoryRepository;
 import com.demo.firstProject.JPA.Repository.AnimalRepository;
 import com.demo.firstProject.Service.Resource.Image.ImageService;
 import com.demo.firstProject.Service.ServiceModel.AnimalService.AnimalModel_CRUD;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,11 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AnimalsService implements AnimalModel_CRUD {
 
@@ -43,23 +46,43 @@ public class AnimalsService implements AnimalModel_CRUD {
     }
 
 
-    // TODO:: Get List Animal
+    // TODO:: Fetch data for Page
     @Override
-    public List<AnimalEntity> AnimalService_GetList() {
-        List<AnimalEntity> animal = animalRepository.findAll();
-        return animal;
+    @Cacheable(value = "AnimalPage", key = "#pageNum")
+    public Page<AnimalDTO> AnimalService_GetPage(int pageNum){
+
+        // fetch animal data
+        Page<AnimalEntity> page = animalRepository.findAllByOrderByCreateTimeAsc(PageRequest.of(pageNum - 1, 3));
+
+        // set animal data to dto
+        Page<AnimalDTO> page_DTO = page.map(
+                result -> result.setAnimal_dto(imageService.getDomainUrl())
+        );
+
+        // log info for show process in method, if redis have data method not process
+        log.info("load page of data, page at:{}", pageNum);
+
+        return page_DTO;
     }
 
 
     // TODO:: Get One Animal by Id
     @Override
-    public AnimalEntity AnimalService_GetOneById(long id) {
+    @Cacheable(value = "AnimalGetById", key = "#id")
+    public AnimalDTO AnimalService_GetOneById(long id) {
         // Check exists by id
         boolean isAnimalEntity = animalRepository.existsById(id);
         if (!isAnimalEntity) {
             throw new BaseException("api.animals.get.field.id.not-found", HttpStatus.NOT_FOUND);
         }
-        return animalRepository.getById(id);
+
+        // fetch animal data
+        AnimalEntity animal = animalRepository.getById(id);
+
+        // set animal data to dto
+        AnimalDTO animalDTO = animal.setAnimal_dto(imageService.getDomainUrl());
+
+        return animalDTO;
     }
 
 
@@ -85,7 +108,7 @@ public class AnimalsService implements AnimalModel_CRUD {
         }
 
         // check field profile image not null
-        if (imageProfile == null) {
+        if (imageProfile.isEmpty()) {
             throw new BaseException("field imageProfile null.", HttpStatus.BAD_REQUEST, path);
         }
 
@@ -104,10 +127,12 @@ public class AnimalsService implements AnimalModel_CRUD {
 
         // check account of owner
         Optional<AccountEntity> accountResult = accountRepository.findById(principal.getName());
-        AccountEntity accountData = accountResult.get();
         if (accountResult.isEmpty()) {
             throw new BaseException("account name not coorect.", HttpStatus.BAD_REQUEST, path);
         }
+
+        // get account data from optional
+        AccountEntity accountData = accountResult.get();
 
         // create name image profile
         String imageProfileName = imageService.getImageName("animal-profile", imageProfile.getOriginalFilename());

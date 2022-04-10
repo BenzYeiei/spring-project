@@ -1,7 +1,6 @@
 package com.demo.firstProject.Service.ServiceModel.AnimalService;
 
-import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
-import org.springframework.http.ResponseEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalCategoryEntity;
 
 import java.util.List;
 

@@ -1,33 +1,23 @@
 package com.demo.firstProject.Service.Resource.Account;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
+import com.demo.firstProject.Component.JsonwebtokenService;
 import com.demo.firstProject.Exception.BaseException;
 import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
 import com.demo.firstProject.JPA.Entity.Account.RoleEntity;
 import com.demo.firstProject.JPA.Repository.Account.AccountRepository;
 import com.demo.firstProject.JPA.Repository.Account.RoleRepository;
-import com.demo.firstProject.Service.ServiceModel.RegisterService.AuthModel;
+import com.demo.firstProject.Service.ServiceModel.AccountService.AuthModel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AuthService implements AuthModel {
 
@@ -42,70 +32,78 @@ public class AuthService implements AuthModel {
 
 
     @Override // TODO: LOGIN
-    public HashMap login(HttpServletRequest request) {
-        // get email and password
-        String email = request.getParameter("email");
+    public HashMap<String, String> login(HttpServletRequest request) {
+        // get username and password
+        String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        // validate email and password
-        if (email == null || password == null) {
-            throw new BaseException("api.login -> email or password is null.", HttpStatus.BAD_REQUEST);
+        // validate username and password
+        if (username == null) {
+            throw new BaseException("username is null.", HttpStatus.BAD_REQUEST, request.getServletPath());
+        }
+
+        // validate username and password
+        if (password == null) {
+            throw new BaseException("password is null.", HttpStatus.BAD_REQUEST, request.getServletPath());
         }
 
         // get account entity
-        AccountEntity accountEntityResult = accountRepository.findByEmail(email);
+        Optional<AccountEntity> accountEntityResult = accountRepository.findByUsername(username);
 
-        // verify email
-        if (accountEntityResult == null) {
-            throw new BaseException("api.login -> email not correct.", HttpStatus.BAD_REQUEST);
+        // verify username
+        if (accountEntityResult.isEmpty()) {
+            throw new BaseException("username not correct.", HttpStatus.BAD_REQUEST, request.getServletPath());
         }
 
+        // get account data
+        AccountEntity account = accountEntityResult.get();
+
         // verify password
-        boolean isPassword = passwordEncoder.matches(password, accountEntityResult.getPassword());
+        boolean isPassword = passwordEncoder.matches(password, account.getPassword());
         if (!isPassword) {
-            throw new BaseException("api.login -> password not correct.", HttpStatus.BAD_REQUEST);
+            throw new BaseException("password not correct.", HttpStatus.BAD_REQUEST, request.getServletPath());
         }
 
         // convert List RoleEntity to List String
-        List<String> getAuthorities = accountEntityResult.getRoles().stream().map(
-                result -> result.getRoleName()
+        List<String> getAuthorities = account.getRoles().stream().map(
+                RoleEntity::getRoleName
         ).collect(Collectors.toList());
 
         // access token
         String accessToken = jsonwebtokenService.genAccessToken(
-                accountEntityResult.getId(),
-                getAuthorities
+                account.getId(),
+                getAuthorities,
+                request.getServletPath()
         );
 
         // refresh token
         String refreshToken = jsonwebtokenService.genRefreshToken(
-                accountEntityResult.getId()
+                account.getId(),
+                request.getServletPath()
         );
 
-        return new HashMap(){{
-            put("accessToken", accessToken);
-            put("refreshToken", refreshToken);
-        }};
+        // set token for return
+        HashMap<String, String> body = new HashMap<>();
+        body.put("accessToken", accessToken);
+        body.put("refreshToken", refreshToken);
+
+        // create log success
+        log.info("login with access token:{}, refresh token:{}", accessToken, refreshToken);
+
+        return body;
     }
 
     @Override
-    public HashMap<String, String> refreshToken(String refreshToken) {
+    public HashMap<String, String> refreshToken(String refreshToken, HttpServletRequest request) {
         // get id or error
-        String getId_or_err = jsonwebtokenService.verityRefreshToken(refreshToken);
-
-        // check error
-        if (getId_or_err.startsWith("err")) {
-            throw new BaseException(
-                    "api.accounts.refreshToken -> " + getId_or_err.substring(3),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        String getId = jsonwebtokenService.verityRefreshToken(refreshToken, request.getServletPath());
 
         // get account data
-        Optional<AccountEntity> accountEntityResult = accountRepository.findById(getId_or_err);
+        Optional<AccountEntity> accountEntityResult = accountRepository.findById(getId);
 
         // check account data is not null
         if (accountEntityResult.isEmpty()) {
-            throw new BaseException("api.accounts.refreshToken -> refresh token not have user.", HttpStatus.BAD_REQUEST);
+            throw new BaseException("refresh token not have user.", HttpStatus.BAD_REQUEST, request.getServletPath());
         }
 
         // account data from optional
@@ -114,13 +112,28 @@ public class AuthService implements AuthModel {
         // get list of role
         List<String> authorities = getAccount.getRoles().stream().map(RoleEntity::getRoleName).collect(Collectors.toList());
 
-        // get access token
-        String accessToken = jsonwebtokenService.genAccessToken(getAccount.getId(), authorities);
+        // gen access token
+        String genAccessToken = jsonwebtokenService.genAccessToken(
+                getAccount.getId(),
+                authorities,
+                request.getServletPath()
+        );
 
-        return new HashMap(){{
-            put("accessToken", accessToken);
-            put("refreshToken", refreshToken);
-        }};
+        // gen refresh token
+        String genRefreshToken = jsonwebtokenService.genRefreshToken(
+                getAccount.getId(),
+                request.getServletPath()
+        );
+
+        // set token for return
+        HashMap<String, String> body = new HashMap<>();
+        body.put("accessToken", genAccessToken);
+        body.put("refreshToken", genRefreshToken);
+
+        // create log success
+        log.info("login with access token:{}, refresh token:{}", genAccessToken, genRefreshToken);
+
+        return body;
     }
 
 }

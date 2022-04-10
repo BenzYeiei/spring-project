@@ -1,21 +1,16 @@
 package com.demo.firstProject.Service.Resource.Animals;
 
 import com.demo.firstProject.Exception.BaseException;
-import com.demo.firstProject.DTO.Animals.AnimalCategoryDTO;
-import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalCategoryEntity;
 import com.demo.firstProject.JPA.Repository.AnimalCategoryRepository;
 import com.demo.firstProject.Service.Resource.Image.ImageService;
 import com.demo.firstProject.Service.ServiceModel.AnimalService.AnimalCategoryModel_CRUD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Service
 public class AnimalCategoryService implements AnimalCategoryModel_CRUD {

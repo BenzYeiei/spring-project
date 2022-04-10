@@ -2,11 +2,8 @@ package com.demo.firstProject.Configuration;
 
 import com.demo.firstProject.Exception.AuthException.AuthExceptionBody;
 import com.demo.firstProject.Filter.CheckTokenFilter;
-import com.demo.firstProject.Service.Resource.Account.JsonwebtokenService;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.StorageOptions;
+import com.demo.firstProject.Component.JsonwebtokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,11 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -47,7 +39,6 @@ public class ConfigSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        System.out.println("configure Http");
 
         http.csrf().disable();
         http.cors().disable();
@@ -59,22 +50,23 @@ public class ConfigSecurity extends WebSecurityConfigurerAdapter {
             "/api/accounts/refresh-token",
             "/api/accounts/login",
             "/api/tests/media-type/**",
+            "/api/tests/redis",
             "/api/tests/fire-base/**"
         ).permitAll();
 
         http.authorizeRequests()
-
+                .antMatchers(HttpMethod.GET, "/actuator/**").hasAnyAuthority("ADMIN")
         ;
 
 
         http.authorizeRequests().antMatchers(
                 "/api/tests/streams"
-        ).hasAuthority("ADMIN");
+        ).hasAnyAuthority("ADMIN");
 
         // animal
         http.authorizeRequests()
                 // public
-                .antMatchers(HttpMethod.GET, "/api/v1/animals").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/animals/page").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/animals/{id}").permitAll()
                 // request admin
                 .antMatchers(HttpMethod.POST, "/api/v1/animals").hasAnyAuthority("ADMIN", "USER")
@@ -101,43 +93,5 @@ public class ConfigSecurity extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new CheckTokenFilter(jsonwebtokenService, authExceptionBody), BasicAuthenticationFilter.class);
 
     }
-
-
-
-    /*
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                // Allows restricting access based upon the HttpServletRequest using RequestMatcher implementations
-                .authorizeRequests()
-                // setting any request
-                .anyRequest()
-                // any request must authenticated
-                .authenticated()
-                // add before setting one value
-                .and()
-                // use basic auth
-                .httpBasic()
-                // add setting
-                .and()
-                // use form for login and logout with Customizer.withDefaults()
-                .formLogin(Customizer.withDefaults())
-        ;
-    }
-    */
-
-
-    //    @Bean
-//    @Override
-//    protected UserDetailsService userDetailsService() {
-//        UserDetails user = User.withDefaultPasswordEncoder()
-//                        .username("benzyeiei")
-//                        .password("rootpassword")
-//                        .roles("ADMIN")
-//                        .build();
-//
-//        return new InMemoryUserDetailsManager(user);
-//    }
-
 
 }

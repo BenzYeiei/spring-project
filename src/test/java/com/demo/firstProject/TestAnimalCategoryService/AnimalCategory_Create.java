@@ -1,6 +1,6 @@
 package com.demo.firstProject.TestAnimalCategoryService;
 
-import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalCategoryEntity;
 import com.demo.firstProject.Service.Resource.Animals.AnimalCategoryService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

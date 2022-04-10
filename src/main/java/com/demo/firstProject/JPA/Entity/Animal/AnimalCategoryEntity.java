@@ -1,6 +1,7 @@
-package com.demo.firstProject.JPA.Entity;
+package com.demo.firstProject.JPA.Entity.Animal;
 
 import com.demo.firstProject.DTO.Animals.AnimalCategoryDTO;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalEntity;
 import lombok.Data;
 
 import javax.persistence.*;

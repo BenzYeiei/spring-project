@@ -1,6 +1,6 @@
 package com.demo.firstProject.JPA.Repository;
 
-import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalCategoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

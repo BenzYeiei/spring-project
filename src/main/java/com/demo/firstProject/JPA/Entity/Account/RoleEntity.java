@@ -21,9 +21,6 @@ public class RoleEntity {
     @Column(name = "role_name", unique = true, nullable = false)
     private String roleName;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
-    private List<PrivilegeEntity> listPrivileges;
-
     @OneToMany(mappedBy = "roles", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AccountEntity> listAccountByRole = new ArrayList<>();
 }

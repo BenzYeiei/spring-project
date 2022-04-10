@@ -1,12 +1,8 @@
-package com.demo.firstProject.JPA.Entity;
+package com.demo.firstProject.JPA.Entity.Animal;
 
-import com.demo.firstProject.Configuration.Domain;
 import com.demo.firstProject.DTO.Animals.AnimalDTO;
 import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -64,7 +60,7 @@ public class AnimalEntity {
                 result -> result.SetAnimalIllustration_dto(domain)
         ).collect(Collectors.toList()));
 
-        animaldto.setCreatedByUser(this.getCreatedByUser().getEmail());
+        animaldto.setCreatedByUser(this.getCreatedByUser().getUsername());
 
         return animaldto;
     }

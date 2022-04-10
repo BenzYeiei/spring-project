@@ -1,7 +1,7 @@
 package com.demo.firstProject.Service.ServiceModel.AnimalService;
 
 import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
-import com.demo.firstProject.JPA.Entity.AnimalEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

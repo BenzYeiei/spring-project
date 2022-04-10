@@ -1,7 +1,7 @@
 package com.demo.firstProject.Controller.Animals;
 
 import com.demo.firstProject.DTO.Animals.AnimalCategoryDTO;
-import com.demo.firstProject.JPA.Entity.AnimalCategoryEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalCategoryEntity;
 import com.demo.firstProject.Service.Resource.Animals.AnimalCategoryService;
 import com.demo.firstProject.Service.Resource.Image.ImageService;
 import org.springframework.http.HttpStatus;

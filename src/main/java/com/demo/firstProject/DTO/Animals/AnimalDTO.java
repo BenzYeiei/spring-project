@@ -1,13 +1,13 @@
 package com.demo.firstProject.DTO.Animals;
 
-import com.demo.firstProject.JPA.Entity.AnimalIllustrationEntity;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class AnimalDTO {
+public class AnimalDTO implements Serializable {
     private long id;
 
     private String name;

@@ -1,8 +1,8 @@
-package com.demo.firstProject.JPA.Entity;
+package com.demo.firstProject.JPA.Entity.Animal;
 
-import com.demo.firstProject.Configuration.Domain;
 import com.demo.firstProject.DTO.Animals.AnimalIllustrationDTO;
 import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalEntity;
 import lombok.Data;
 
 import javax.persistence.*;

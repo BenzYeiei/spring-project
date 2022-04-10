@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -21,23 +22,36 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/api")
+@RequestMapping("/api/accounts")
 public class AccountController {
 
     @Autowired
     private AuthService authService;
 
 
-    @PostMapping(path = "/accounts/login")
-    public ResponseEntity accountControl_Login(HttpServletRequest request){
+    @GetMapping(path = "/email")
+    public ResponseEntity accountControl_getAccount(
+        @RequestParam(name = "username", required = false) String username,
+        HttpServletRequest request
+    ) {
+        //
+        if (username.isEmpty()) {
+            throw new BaseException("email is null", HttpStatus.BAD_REQUEST, request.getServletPath());
+        }
+
+        return ResponseEntity.ok().body(null);
+    }
+
+    @PostMapping(path = "/login")
+    public ResponseEntity<HashMap<String, String>> accountControl_Login(HttpServletRequest request){
 
         HashMap<String, String> token = authService.login(request);
 
         return ResponseEntity.ok().body(token);
     }
 
-    @GetMapping(path = "/accounts/refresh-token")
-    public ResponseEntity accessDenied(HttpServletRequest request){
+    @GetMapping(path = "/refresh-token")
+    public ResponseEntity<HashMap<String, String>> accessDenied(HttpServletRequest request){
         // get refresh token
         String refreshToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -45,8 +59,6 @@ public class AccountController {
         if (refreshToken == null) {
             throw new BaseException("api.accounts.refreshToken -> refresh token is null.", HttpStatus.BAD_REQUEST);
         }
-
-        System.out.println(refreshToken);
 
         // check token start with Bearer
         if (!refreshToken.startsWith("Bearer ")) {
@@ -57,7 +69,7 @@ public class AccountController {
         String convertToken = refreshToken.substring(7);
 
         // use service
-        HashMap<String, String> token = authService.refreshToken(convertToken);
+        HashMap<String, String> token = authService.refreshToken(convertToken, request);
 
         return ResponseEntity.ok().body(token);
     }

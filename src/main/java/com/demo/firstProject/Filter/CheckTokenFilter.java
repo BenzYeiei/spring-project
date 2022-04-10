@@ -1,8 +1,7 @@
 package com.demo.firstProject.Filter;
 
 import com.demo.firstProject.Exception.AuthException.AuthExceptionBody;
-import com.demo.firstProject.Service.Resource.Account.JsonwebtokenService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.demo.firstProject.Component.JsonwebtokenService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

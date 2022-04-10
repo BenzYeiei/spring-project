@@ -1,7 +1,7 @@
 package com.demo.firstProject.TestAnimalService;
 
 import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
-import com.demo.firstProject.JPA.Entity.AnimalEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalEntity;
 import com.demo.firstProject.JPA.Repository.Account.AccountRepository;
 import com.demo.firstProject.JPA.Repository.AnimalRepository;
 import com.demo.firstProject.Service.Resource.Animals.AnimalsService;

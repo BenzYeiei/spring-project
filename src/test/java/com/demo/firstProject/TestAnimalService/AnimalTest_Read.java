@@ -2,7 +2,7 @@ package com.demo.firstProject.TestAnimalService;
 
 import com.demo.firstProject.DTO.Animals.AnimalDTO;
 import com.demo.firstProject.JPA.Entity.Account.AccountEntity;
-import com.demo.firstProject.JPA.Entity.AnimalEntity;
+import com.demo.firstProject.JPA.Entity.Animal.AnimalEntity;
 import com.demo.firstProject.JPA.Repository.Account.AccountRepository;
 import com.demo.firstProject.JPA.Repository.AnimalRepository;
 import com.demo.firstProject.Service.Resource.Animals.AnimalsService;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
@@ -47,7 +46,7 @@ public class AnimalTest_Read {
         // get animal data
         AnimalEntity animal_old = animal_old_optional.get();
 
-        AnimalEntity animal = animalsService.AnimalService_GetOneById(animal_old.getId());
+        AnimalDTO animal = animalsService.AnimalService_GetOneById(animal_old.getId());
 
         Assertions.assertNotNull(animal);
 

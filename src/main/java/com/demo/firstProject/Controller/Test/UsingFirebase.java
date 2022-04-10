@@ -1,10 +1,7 @@
 package com.demo.firstProject.Controller.Test;
 
 import com.demo.firstProject.Exception.BaseException;
-import com.demo.firstProject.Service.Resource.Image.ImageService;
 import com.demo.firstProject.Service.Resource.Image.ImageService_Firebase;
-import com.google.cloud.storage.*;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,13 +18,10 @@ import java.util.ArrayList;
 @Controller
 public class UsingFirebase {
 
-    private final StorageOptions cloud_FireStorage;
-    private final String getBucketName_FireBase;
     private final ImageService_Firebase imageService_firebase;
 
-    public UsingFirebase(StorageOptions cloud_fireStorage, String getBucketName_fireBase, ImageService_Firebase imageService_firebase) {
-        cloud_FireStorage = cloud_fireStorage;
-        getBucketName_FireBase = getBucketName_fireBase;
+    public UsingFirebase(ImageService_Firebase imageService_firebase) {
+
         this.imageService_firebase = imageService_firebase;
     }
 
