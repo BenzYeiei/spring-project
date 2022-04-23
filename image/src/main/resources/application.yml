@@ -1,0 +1,29 @@
+
+### Server port
+server:
+  port: '8082'
+
+### environment size of file
+file:
+  size: 10MB
+
+### Spring configuration
+spring:
+  application:
+    name: image-microservice
+  servlet:
+    multipart:
+      max-file-size: ${file.size}
+      max-request-size: ${file.size}
+
+### image root
+image:
+  dir_name:
+    base: C:/WorkByJava/springBoot/animalshopping/backend/uploads
+    animal:
+      test: C:/WorkByJava/springBoot/animalshopping/backend/src/test/Image_Test
+      nodeValue: C:/WorkByJava/springBoot/animalshopping/backend/uploads/animals/
+    root: uploads
+    illustration: C:/WorkByJava/springBoot/animalshopping/backend/uploads/animals/illustrations
+  fetch:
+    domain: http://127.0.0.1:8082

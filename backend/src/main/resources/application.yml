@@ -1,0 +1,51 @@
+file:
+  size: 10MB
+
+### server port
+server:
+  port: '8080'
+
+### spring configuration
+spring:
+  servlet:
+    multipart:
+      max-file-size: ${file.size}
+      max-request-size: ${file.size}
+  datasource:
+    password: benzyeiei
+    username: postgres
+    url: jdbc:postgresql://localhost:2345/spring_postgresql_firstproject
+  jpa:
+    hibernate:
+      ddl-auto: update
+  data:
+    redis:
+      repositories:
+        enabled: false # off redis repository because project use spring data jps
+  redis:
+    host: localhost
+    port: '9736'
+  cache:
+    type: redis
+    redis:
+      time-to-live: '120000'
+  kafka:
+    bootstrap-servers: localhost:2909
+
+### image directory
+image:
+  dir_name:
+    base: C:/WorkByJava/springBoot/animalshopping/backend/uploads
+    animal: C:/WorkByJava/springBoot/animalshopping/backend/uploads/animals/
+    root: uploads
+    illustration: C:/WorkByJava/springBoot/animalshopping/backend/uploads/animals/illustrations
+  fetch:
+    domain: http://127.0.0.1:8080
+domain_url: 127.0.0.1:8080
+
+### jwt config
+jwt:
+  secret: timeout
+  issuer: /api/accounts/login
+
+
